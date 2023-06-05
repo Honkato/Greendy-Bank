@@ -6,7 +6,7 @@ import Home from './screens/home'
 import NavBar from './components/navbar'
 import Cadastro from './screens/cadastro/cadastro'
 import { Route, Routes, useNavigate, useLocation, createBrowserRouter, RouterProvider, Link } from 'react-router-dom'
-import Login from '../../store/src/screens/Login'
+
 import FormLogin from './components/formLogin'
 import axios from 'axios'
 import Extrato from './screens/ex-trato'
