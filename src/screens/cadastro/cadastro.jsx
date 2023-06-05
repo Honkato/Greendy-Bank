@@ -5,16 +5,17 @@ import { json } from "react-router-dom";
 import FormUsuario from "./formUsuario";
 import FormEndereco from "./formEndereco";
 import FormContato from "./formContato";
-import axios from "axios";
+
 import FormSenha from "./formSenha";
+import api from "../../components/api";
 
 function Cadastro() {
     const [form, setForm] = useState(0)
     const [user, setUser] = useState({})
+    const [criar, setCriar] = useState(false)
     const [password, setPassword] = useState({
         password:''
     })
-
     const [dadosUsuario, setDadosUsuario] = useState({
         //COMMON
         nome: "",
@@ -63,17 +64,25 @@ function Cadastro() {
         cep: "",
     })
 
-    const createNewEndereco = () => {
-        axios.post("http://127.0.0.1:8000/bank/enderecos/", dadosEndereco).then((res) => {
-            console.log(res.data)
 
+    useEffect(()=>{
+        if (criar){
+            createNewContato()
+        }
+        setCriar(false)
+    }, [dadosContato.cliente])
+
+    const createNewEndereco = () => {
+        api.post("bank/enderecos/", dadosEndereco).then((res) => {
+            console.log(res.data)
+            alert("usuario criado com sucesso!")
         }).catch((erro) => {
             alert(erro)
         })
 
     }
     const createNewContato = () => {
-        axios.post("http://127.0.0.1:8000/bank/contatos/", dadosContato).then((res) => {
+        api.post("bank/contatos/", dadosContato).then((res) => {
             console.log(res.data)
             createNewEndereco()
         }).catch((erro) => {
@@ -84,17 +93,15 @@ function Cadastro() {
 
     // }
     const createNewUser = () => {
-        axios.post("http://127.0.0.1:8000/auth/users/", dadosUsuario, {
+        api.post("auth/users/", dadosUsuario, {
             headers:{
                 'Content-Type':'multipart/form-data'
             }
         }).then(async(res) => {
-            setUser(res.data)
-            console.log(res.data)
+            setCriar(true)
             setTimeout(()=>{
-                createNewContato()
-            }, 500)
-            
+                setUser(res.data)
+            }, 1000)
         }).catch((erro) => {
             alert(erro)
         })
@@ -122,35 +129,27 @@ function Cadastro() {
         }
     }, [dadosUsuario.tipo_de_pessoa])
     return (
-        <>
-            <div className='flex h-screen bg-gradient-to-t from-[#5C9794] to-[#22CC91]'>
+        <div className="flex flex-col">
+            <div className='flex justify-center h-screen bg-gradient-to-t p-5 from-[#5C9794] to-[#22CC91]'>
 
-                {form == 0 ?
-                    <FormUsuario dados={dadosUsuario} setDados={setDadosUsuario} setForm={setForm} />
-                    :
-                    <>
-                        {form == 1 ?
-                        
+                {form == 0 ? <FormUsuario dados={dadosUsuario} setDados={setDadosUsuario} setForm={setForm} />
+                    :<>{form == 1 ?
                             <FormEndereco dados={dadosEndereco} setDados={setDadosEndereco} setForm={setForm} />
-                            :
-                            <>
-                                {form == 2 ?
+                            :<>{form == 2 ?
                                     <FormContato dados={dadosContato} setDados={setDadosContato} setForm={setForm} />
                                     :
-                                    <FormSenha dados={password} setDados={setPassword} setForm={setForm} createUser={createUser}
-                                    />
-                                }
-                            </>
-
-                        }
-                        
-                    </>
+                                    <FormSenha dados={password} setDados={setPassword} setForm={setForm} createUser={createUser}/>
+                                }</>
+                        }</>
                 }
                 
-                {form}
 
+                
+                <div className="">
 
-
+                </div>
+            </div>
+                {/* devmode 
                 <button onClick={() => {
                     console.log("user:")
                     console.log((dadosUsuario))
@@ -162,12 +161,9 @@ function Cadastro() {
                     console.log((user))
                 }}>
                     dados
-                </button>
-                <div className="">
-
-                </div>
-            </div>
-        </>
+                </button> */}
+            
+        </div>
     );
 }
 

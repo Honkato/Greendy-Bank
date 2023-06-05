@@ -4,7 +4,7 @@ function FormBasico({ dados, setDados, info }) {
     
     return (
         <>
-            {info.map(item =>
+            {info.map((item, index) =>
                 <div className="flex flex-col" key={item.nome}>
 
                     <text className="font-semibold">
@@ -12,7 +12,7 @@ function FormBasico({ dados, setDados, info }) {
                     </text>
                     {item.req ?
                         <input
-                            className={item.customClassName != undefined ? item.customClassName :"p-1 bg-white text-black rounded-xl h-fit w-fit outline-none"}
+                            className={item.customClassName != undefined ? item.customClassName :"p-1 bg-white text-black rounded-xl h-fit w-full outline-none"}
                             required
                             type={item.type != undefined ? item.type : "text"}
                             id={item.id != undefined ? item.id : undefined}
@@ -26,7 +26,7 @@ function FormBasico({ dados, setDados, info }) {
                             }}
                         /> :
                         <input
-                            className={item.customClassName != undefined ? item.customClassName :"p-1 bg-white text-black rounded-xl h-fit w-fit outline-none"}
+                            className={item.customClassName != undefined ? item.customClassName :"p-1 bg-white text-black rounded-xl h-fit w-full outline-none"}
                             type={item.type != undefined ? item.type : "text"}
                             id={item.id != undefined ? item.id : undefined}
                             name={item.nome}

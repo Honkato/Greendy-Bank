@@ -10,7 +10,7 @@ const NavBar = ({ forms, showNavBar, goHome }) => {
                 {forms}
             </div>
 
-            <nav className="w-full h-fit bg-[#287A6B] flex flex-col  justify-around">
+            <nav className="w-full h-fit shadow-lg bg-[#287A6B] flex flex-col  justify-around">
                 <div className="flex flex-row shadow-2xl h-16 items-center justify-between">
                     <div className="m-2">
                         <button onClick={goHome} className="bg-transparent rounded-full">

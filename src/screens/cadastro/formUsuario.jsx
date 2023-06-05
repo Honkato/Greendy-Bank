@@ -1,23 +1,66 @@
+import api from "../../components/api";
 import FormBasico from "./formBasico";
 
-function FormUsuario({ dados, setDados, setForm }) {
-    // const getBase64 = (file)=> {
-    //     if (file == ""){
-    //         return
-    //     }
-    //     let document = "";
-    //     let reader = new FileReader();
-    //     reader.readAsDataURL(file);
-    //     reader.onload = function () {
-    //         document = reader.result;
-    //     };
-    //     reader.onerror = function (error) {
-    //         console.log('Error: ', error);
-    //     };
 
-    //     return document;
-    // }
+function FormUsuario({ dados, setDados, setForm }) {
+    function validarCNPJ(cnpj) {
+
+        cnpj = cnpj.replace(/[^\d]+/g, '');
+
+        if (cnpj == '') return false;
+
+        if (cnpj.length != 14)
+            return false;
+
+        // Elimina CNPJs invalidos conhecidos
+        if (cnpj == "00000000000000" ||
+            cnpj == "11111111111111" ||
+            cnpj == "22222222222222" ||
+            cnpj == "33333333333333" ||
+            cnpj == "44444444444444" ||
+            cnpj == "55555555555555" ||
+            cnpj == "66666666666666" ||
+            cnpj == "77777777777777" ||
+            cnpj == "88888888888888" ||
+            cnpj == "99999999999999")
+            return false;
+
+        // Valida DVs
+        let tamanho = cnpj.length - 2
+        let numeros = cnpj.substring(0, tamanho);
+        let digitos = cnpj.substring(tamanho);
+        let soma = 0;
+        let i = 0;
+        let pos = tamanho - 7;
+        for (i = tamanho; i >= 1; i--) {
+            soma += numeros.charAt(tamanho - i) * pos--;
+            if (pos < 2)
+                pos = 9;
+        }
+        let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(0))
+            return false;
+
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0, tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        for (i = tamanho; i >= 1; i--) {
+            soma += numeros.charAt(tamanho - i) * pos--;
+            if (pos < 2)
+                pos = 9;
+        }
+        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(1))
+            return false;
+
+        return true;
+
+    }
     function TestaCPF(strCPF) {
+        if (strCPF.length == 14) {
+            return validarCNPJ(strCPF)
+        }
         let Soma;
         let Resto;
         Soma = 0;
@@ -82,25 +125,51 @@ function FormUsuario({ dados, setDados, setForm }) {
         }
 
     }
+    const proximo = async () => {
+        let block = false
+        await api.get(`bank/cnpjcpf/${dados.identifier}`)
+            .then((res) => {
+                if (res.data.exist) {
+                    alert('esse CPF/CNPJ ja existe no nosso banco')
+                    block = true
+                }
+            })
+        await api.get(`bank/rg/${dados.rg}`)
+            .then((res) => {
+                if (res.data.exist) {
+                    alert('esse rg ja existe no nosso banco')
+                    block = true
+                }
+            })
+        if (block) {
+            return
+        }
+        setForm(1)
+    }
 
     return (
         <>
-            <form onSubmit={(e) => {
+            <form onSubmit={async (e) => {
                 e.preventDefault();
                 if (dados.tipo_de_pessoa != '') {
                     if (!TestaCPF(dados.identifier)) {
                         alert("CPF inválido")
                         return
                     }
-                    if (!descobrirDigito(dados.rg)) {
-                        alert("RG inválido")
-                        return
-                    };
-                    setForm(1)
+                    if (dados.tipo_de_pessoa == 'F') {
+                        if (!descobrirDigito(dados.rg)) {
+                            alert("RG inválido")
+                            return
+                        };
+                    }
+                    proximo()
+
+
+
                 } else {
                     alert('É necessario definir o tipo de cliente')
                 }
-            }}>
+            }} className="w-96">
                 <FormBasico dados={dados} setDados={setDados} info={[
 
                 ]}
@@ -123,8 +192,8 @@ function FormUsuario({ dados, setDados, setForm }) {
                                 { 'nome': "nome", 'ml': 200, 'req': true, 'mask': 'nome' },
                                 { 'nome': "nomeSocial", 'ml': 200, 'req': false, 'mask': 'nome social' },
                                 { 'nome': "date_of_birth", 'ml': 8, 'req': true, 'mask': 'data de nascimento', 'type': 'date' },
-                                { 'nome': "identifier", 'ml': 11, 'req': true, 'mask':'cpf' },
-                                { 'nome': "rg", 'ml': 9, 'req': true }
+                                { 'nome': "identifier", 'ml': 11, 'req': true, 'mask': 'cpf', 'customClassName': "p-1 bg-white text-black rounded-xl h-fit w-fit outline-none" },
+                                { 'nome': "rg", 'ml': 9, 'req': true, 'customClassName': "p-1 bg-white text-black rounded-xl h-fit w-fit outline-none" }
                             ]}
                             />
                             :
@@ -132,9 +201,9 @@ function FormUsuario({ dados, setDados, setForm }) {
                                 { 'nome': "nome", 'ml': 200, 'req': true, 'mask': 'nome_razao_social' },
                                 { 'nome': "nomeSocial", 'ml': 200, 'req': false, 'mask': 'nome_fantasia' },
                                 { 'nome': "date_of_birth", 'ml': 8, 'req': true, 'mask': 'data de criação', 'type': 'date' },
-                                { 'nome': "identifier", 'ml': 14, 'req': true, 'mask':'cnpj' },
-                                { 'nome': "inscricao_estadual", 'ml': 9, 'req': true },
-                                { 'nome': "inscricao_municipal", 'ml': 12, 'req': true }
+                                { 'nome': "identifier", 'ml': 14, 'req': true, 'mask': 'cnpj', 'customClassName': "p-1 bg-white text-black rounded-xl h-fit w-fit outline-none" },
+                                { 'nome': "inscricao_estadual", 'ml': 9, 'req': true, 'customClassName': "p-1 bg-white text-black rounded-xl h-fit w-fit outline-none" },
+                                { 'nome': "inscricao_municipal", 'ml': 12, 'req': true, 'customClassName': "p-1 bg-white text-black rounded-xl h-fit w-fit outline-none" }
                             ]}
                             />
                         }

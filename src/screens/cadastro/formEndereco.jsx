@@ -11,7 +11,7 @@ function FormEndereco({ dados, setDados, setForm }) {
                 } else if (btn.id == "next") {
                     setForm(2)
                 }
-            }}>
+            }} className="w-96">
                 <FormBasico dados={dados} setDados={setDados} info={[
                     { 'nome': "cep", 'ml': 8, 'req': true, 'type': 'number' },
                     { 'nome': "uf", 'ml': 2, 'req': true },
