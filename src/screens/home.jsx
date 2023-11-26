@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import api from "../components/api";
 
 function Home() {
-    const angularB = 'src\\assets\\images\\angularB.png'
-    const angularW = 'src\\assets\\images\\angularW.png'
-    const caramelo = 'src\\assets\\images\\caramelo.png'
-    const centralized = 'src\\assets\\images\\centralized.png'
-    const footer = 'src\\assets\\images\\footer.png'
-    const pixImage = 'src\\assets\\images\\pixImage.png'
+    const angularB = 'src/assets/images/angularB.png'
+    const angularW = 'src/assets/images/angularW.png'
+    const caramelo = 'src/assets/images/caramelo.png'
+    const centralized = 'src/assets/images/centralized.png'
+    const footer = 'src/assets/images/footer.png'
+    const pixImage = 'src/assets/images/pixImage.png'
 
     const [extrato, setExtrato] = useState([])
 
